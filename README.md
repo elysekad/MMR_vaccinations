@@ -30,6 +30,6 @@ You probably only need to enter the last three the first time you run the script
 
 ### Examples of plots
 
-![Alt text](/screenshot/County_1_CDC_week_6_adult.png?raw=true)
+![Alt text](/plots/County_1_CDC_week_6_adult.png?raw=true)
 
-![Alt text](/screenshot/County_1_CDC_week_6_youth.png?raw=true)
+![Alt text](/plots/County_1_CDC_week_6_youth.png?raw=true)
