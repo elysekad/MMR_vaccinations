@@ -15,7 +15,7 @@ Due to the measles outbreak in Clark County, DOH needed a way to visualize chang
 
 Download MMR_plots.Rmd and rendering_plots.R. Create a folder where you would like the reports to be saved. 
 
-## Running the scripts
+### Running the scripts
 
 When you run the “rendering_plots.R” file, you have to enter the parameters at the top of the page in between the rows of #'s:
 
@@ -27,3 +27,9 @@ When you run the “rendering_plots.R” file, you have to enter the parameters 
 *	Rmd_file – this is the file path to the “MMR_plots_final.Rmd” file
 
 You probably only need to enter the last three the first time you run the script. Once you enter these parameters, highlight all and run the script. It will create a folder with the week number as the title in the reports_file_path folder. The folder will have the report and a folder labeled “plots” with all of the plots. You do not need to open or make any changes to the MMR_plots.Rmd file. 
+
+### Examples of plots
+
+![Alt text](/screenshot/County_1_CDC_week_6_adult.png?raw=true)
+
+![Alt text](/screenshot/County_1_CDC_week_6_youth.png?raw=true)
