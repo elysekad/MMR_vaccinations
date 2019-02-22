@@ -1,0 +1,137 @@
+---
+title: "MMR_plots"
+author: "Washington State DOH"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: html_document
+params:
+  data_file_path: ''
+  reports_file_path: ''
+  last_week: ''
+  administered_date: ''
+  reported_date: ''
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#loading required packges
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
+```{r, echo=FALSE}
+#Reading in raw data as a dataframe named "weekly_counts" 
+weekly_counts <- read_excel(params$data_file_path)
+
+#filtering out weekly rows greater than last_week
+weekly_counts$week <- as.numeric(weekly_counts$week)
+last_week <- as.numeric(params$last_week)
+weekly_counts <- weekly_counts %>% filter(week<=params$last_week)
+
+#replacing NA's and blank cells with 0
+weekly_counts[is.na(weekly_counts)] <- 0
+weekly_counts[weekly_counts==''] <- 0
+weekly_counts[weekly_counts==' '] <- 0
+
+#reshaping data so that we're able to group by time periods (2014-2018, 2019) in ggplot
+youth <- gather(weekly_counts, `avg_0to18yrs`, `count_2019_0to18yrs`, key='time_period', value='counts')
+adult <- gather(weekly_counts, `avg_19plusyrs`, `count_2019_19plusyrs`, key='time_period', value='counts')
+
+```
+
+```{r echo=FALSE}
+#setting colors for plots. This ensures that the plot color for each group is the same for each plot. 
+colors <- function(df){
+            myColors <- c('#d80f20', '#0015ff')
+            df$time_period <- as.factor(df$time_period)
+            names(myColors) <- levels(df$time_period)
+            myColors
+            }
+
+colors_youth <- colors(youth)
+colors_adult <- colors(adult)
+
+#creating function that creates each ggplot. input df (youth or adult), county, color scale (youth or adult)
+making_plot <- function(df, county, color) {
+  
+  county_quo <- enquo(county)
+  max <- df %>% filter(COUNTY == !!county_quo) %>% summarise(max(counts))
+  
+  if (max$`max(counts)`==0) {max$`max(counts)` <- 10}
+    
+  scale <- max$`max(counts)`/10
+  
+  if (deparse(substitute(df))=='youth') {
+    title=paste0('Number of Measles Containing Vaccines Administered to Those 1-18 Years Old by Week* \nComparing Average Number in 2014-2018 with 2019, ', county, ' County, WA')} else {
+      title=paste0('Number of Measles Containing Vaccines Administered to those 19 Years and Older by Week* \nComparing Average Number in 2014-2018 with 2019, ', county, ' County, WA')}
+  
+  ggplot(data=df[df$COUNTY == county, ], aes(week, counts, fill=time_period)) +
+    geom_bar(stat='identity', width=.5, position=position_dodge()) +
+    geom_text(size=2.5, aes(label=round(counts, 1)), position=position_dodge(width=.5), vjust=-0.25)+
+    scale_fill_manual(name="Time Period", values=color, labels=c("Average '14-'18", "2019")) +
+    scale_x_continuous(breaks=1:params$last_week) + 
+    labs(title=title,
+         x='CDC Week',
+         y='Number Measles Containing Vaccines Administered',
+         caption=paste0("Data source: WA State Immunization Information System; all vaccines administered as of ", params$administered_date," and reported as of ", params$reported_date, "\n*CDC Week is Sunday-Saturday; Week 3 2019 started 1/13/2019")) +
+    theme(plot.title=element_text(size=13.5, hjust=.5)) +
+    scale_y_continuous(expand = c(0, 0), limits=c(0, max$`max(counts)`+scale)) +
+    theme(axis.text = element_text(size=10),
+          axis.title = element_text(size=10),
+          legend.text = element_text(size=10),
+          legend.title = element_text(size=10),
+          legend.position="top",
+          plot.caption = element_text(hjust=0, size=9))
+  
+}
+
+```
+  
+  
+  
+
+```{r fig.width=8, echo=FALSE, results='asis', fig.align='center'}
+#create week_# folder in "reports" folder if doesn't exist already. this is where html report will be saved.  
+dir.create(file.path(params$reports_file_path, paste0("week_", params$last_week)), showWarnings = FALSE)
+
+#creating folder in week_# folder called "plots" where all of the plots will be saved
+setwd(paste0(params$reports_file_path, "/week_", params$last_week))
+dir.create(file.path("plots"), showWarnings = FALSE)
+setwd(file.path(params$reports_file_path, paste0("week_", last_week, "/plots")))
+
+#creating plots for all of the counties. plots are saved in "plots" folder and also rendered subsequently in report
+for (county in unique(weekly_counts$COUNTY)) {
+  cat('\n')
+  cat("<center> <h3> ", county, " County</h3> </center>")
+  cat('\n')
+  youth_plot=making_plot(youth, county, colors_youth)
+  print(youth_plot)
+  cat('\n')
+  adult_plot <- making_plot(adult, county, colors_adult)
+  print(adult_plot)
+  cat('\n')
+    
+  ggsave(youth_plot, 
+         file=paste0(county,"_CDC_week_", last_week, "_youth.png"),
+         width = 25,
+         height=15,
+         units="cm")
+  
+  ggsave(adult_plot, 
+         file=paste0(county,"_CDC_week_", last_week, "_adult.png"),
+         width = 25,
+         height=15,
+         units="cm")
+}
+```
+
+
+
+
+
+
+
