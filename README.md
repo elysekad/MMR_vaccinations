@@ -19,11 +19,11 @@ Download MMR_plots.Rmd and rendering_plots.R. Create a folder where you would li
 
 When you run the “rendering_plots.R” file, you have to enter the parameters at the top of the page in between the rows of #'s:
 
-•	last_week – this is the week number of the most recent week you wanted included in this report
-•	administered_date – administered date that goes in footnote of plot ("All vaccines administered as of 'administered_date' and reported as of 'reported_date'")
-•	reported_date – reported date that goes in footnote of plot
-•	data_file_path – file path to excel file with MMR vaccine data
-•	reports_file_path – path to folder where you would like the reports/plots to be saved
-•	Rmd_file – this is the file path to the “MMR_plots_final.Rmd” file
+*	last_week – this is the week number of the most recent week you wanted included in this report
+*	administered_date – administered date that goes in footnote of plot ("All vaccines administered as of 'administered_date' and reported as of 'reported_date'")
+*	reported_date – reported date that goes in footnote of plot
+*	data_file_path – file path to excel file with MMR vaccine data
+*	reports_file_path – path to folder where you would like the reports/plots to be saved
+*	Rmd_file – this is the file path to the “MMR_plots_final.Rmd” file
 
 You probably only need to enter the last three the first time you run the script. Once you enter these parameters, highlight all and run the script. It will create a folder with the week number as the title in the reports_file_path folder. The folder will have the report and a folder labeled “plots” with all of the plots.
